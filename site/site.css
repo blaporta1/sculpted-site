@@ -227,6 +227,12 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .ba-frames { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--cream-warm); border: 1px solid var(--rule); }
 .ba-frame { aspect-ratio: 3/4; position: relative; background: linear-gradient(180deg, #D8C3B0, #B89A80); overflow: hidden; filter: blur(2px); }
 .ba-frame--after { background: linear-gradient(180deg, #E8D5C2, #C8AE95); }
+.ba-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+  display: block;
+}
 .ba-frame::after {
   content: attr(data-label);
   position: absolute; top: 12px; left: 12px;
