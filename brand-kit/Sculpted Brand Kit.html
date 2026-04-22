@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sculpted Medspa — Brand Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="sections-1.jsx"></script>
+<script type="text/babel" src="sections-2.jsx"></script>
+<script type="text/babel" src="sections-3.jsx"></script>
+<script type="text/babel" src="sections-4.jsx"></script>
+
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "palette": "blush",
+  "typePairing": "cormorant-inter",
+  "density": "airy"
+}/*EDITMODE-END*/;
+
+const PALETTE_OPTIONS = {
+  blush:      { label: 'Blush',      primary: '#FCC2E6', accent: '#E4739E', cream: '#FBF6F1' },
+  rose:       { label: 'Deep Rose',  primary: '#F5A3D2', accent: '#B75B7E', cream: '#FBF6F1' },
+  champagne:  { label: 'Champagne',  primary: '#EBDEC3', accent: '#C9A96E', cream: '#FBF6F1' },
+  porcelain:  { label: 'Porcelain',  primary: '#F3EBDF', accent: '#111111', cream: '#FBF6F1' },
+};
+const TYPE_PAIRINGS = {
+  'cormorant-inter':   { label: 'Cormorant × Inter',     display: "'Cormorant Garamond', serif", text: "Inter, sans-serif" },
+  'playfair-inter':    { label: 'Playfair × Inter',      display: "'Playfair Display', serif",   text: "Inter, sans-serif" },
+  'dmserif-dmsans':    { label: 'DM Serif × DM Sans',    display: "'DM Serif Display', serif",   text: "'DM Sans', sans-serif" },
+};
+
+function applyTweaks(t) {
+  const pal = PALETTE_OPTIONS[t.palette] || PALETTE_OPTIONS.blush;
+  const type = TYPE_PAIRINGS[t.typePairing] || TYPE_PAIRINGS['cormorant-inter'];
+  const root = document.documentElement;
+  root.style.setProperty('--blush', pal.primary);
+  root.style.setProperty('--rose', pal.accent);
+  root.style.setProperty('--cream', pal.cream);
+  root.style.setProperty('--display', type.display);
+  root.style.setProperty('--text', type.text);
+  root.style.setProperty('--density', t.density === 'dense' ? '0.75' : '1');
+  // ensure webfont loaded
+  if (type.display.includes('Playfair') && !document.getElementById('pf')) {
+    const l = document.createElement('link'); l.id='pf'; l.rel='stylesheet';
+    l.href='https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&display=swap';
+    document.head.appendChild(l);
+  }
+  if (type.display.includes('DM Serif') && !document.getElementById('dms')) {
+    const l = document.createElement('link'); l.id='dms'; l.rel='stylesheet';
+    l.href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap';
+    document.head.appendChild(l);
+  }
+}
+
+function Tweaks({ open, onClose, tweaks, setTweaks }) {
+  const update = (patch) => {
+    const next = { ...tweaks, ...patch };
+    setTweaks(next);
+    applyTweaks(next);
+    window.parent.postMessage({type:'__edit_mode_set_keys', edits: patch}, '*');
+  };
+  return (
+    <div className={`tweaks ${open ? 'active' : ''}`}>
+      <div className="tweaks-header">
+        <div className="tweaks-title">Tweaks</div>
+        <button className="tweaks-close" onClick={onClose}>×</button>
+      </div>
+      <div className="tweak-group">
+        <label>PALETTE</label>
+        <div className="tweak-swatches">
+          {Object.entries(PALETTE_OPTIONS).map(([k, v]) => (
+            <div key={k}
+              className={`tweak-swatch ${tweaks.palette === k ? 'active' : ''}`}
+              style={{background: v.primary}}
+              title={v.label}
+              onClick={() => update({palette: k})}/>
+          ))}
+        </div>
+      </div>
+      <div className="tweak-group">
+        <label>TYPE PAIRING</label>
+        <div className="tweak-pill-row">
+          {Object.entries(TYPE_PAIRINGS).map(([k, v]) => (
+            <button key={k}
+              className={`tweak-pill ${tweaks.typePairing === k ? 'active' : ''}`}
+              onClick={() => update({typePairing: k})}>{v.label}</button>
+          ))}
+        </div>
+      </div>
+      <div className="tweak-group">
+        <label>DENSITY</label>
+        <div className="tweak-pill-row">
+          {['airy','dense'].map(d => (
+            <button key={d}
+              className={`tweak-pill ${tweaks.density === d ? 'active' : ''}`}
+              onClick={() => update({density: d})}>{d.toUpperCase()}</button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [tweaks, setTweaks] = React.useState(TWEAK_DEFAULTS);
+  const [editOpen, setEditOpen] = React.useState(false);
+  const [active, setActive] = React.useState('cover');
+
+  React.useEffect(() => {
+    applyTweaks(TWEAK_DEFAULTS);
+
+    const handler = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setEditOpen(true);
+      if (e.data?.type === '__deactivate_edit_mode') setEditOpen(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({type:'__edit_mode_available'}, '*');
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    document.querySelectorAll('[id]').forEach(el => {
+      if (['cover','intro','logo','color','type','voice','icons','photography','components','applications'].includes(el.id)) io.observe(el);
+    });
+
+    return () => { window.removeEventListener('message', handler); io.disconnect(); };
+  }, []);
+
+  const nav = [
+    ['cover','00','Cover'],
+    ['intro','00','Introduction'],
+    ['logo','01','Logo'],
+    ['color','02','Color'],
+    ['type','03','Typography'],
+    ['voice','04','Voice'],
+    ['icons','05','Icons'],
+    ['photography','06','Photography'],
+    ['components','07','Components'],
+    ['applications','08','Applications'],
+  ];
+
+  return (
+    <div className="app">
+      <aside className="sidenav">
+        <div className="sidenav-mark">
+          <div className="wm">SCULPTED<sup>™</sup></div>
+          <div className="sw"><Rule width={16}/> MEDSPA <Rule width={16}/></div>
+        </div>
+        <div className="sidenav-title">The Brand Book<br/>Vol. 01 · 2026</div>
+        <ul className="sidenav-list">
+          {nav.map(([id, num, label]) => (
+            <li key={id}><a href={`#${id}`} className={active === id ? 'active' : ''}><span className="num">{num}</span><span>{label}</span></a></li>
+          ))}
+        </ul>
+        <div className="sidenav-foot">CONFIDENCE,<br/>ENGINEERED.</div>
+      </aside>
+
+      <main className="main">
+        <SectionCover />
+        <SectionIntro />
+        <SectionLogo />
+        <SectionColor />
+        <SectionType />
+        <SectionVoice />
+        <SectionIcons />
+        <SectionPhoto />
+        <SectionComponents />
+        <SectionApplications />
+
+        <footer style={{marginTop: 120, paddingTop: 40, borderTop: '1px solid var(--rule)', display:'flex', justifyContent:'space-between', fontFamily:'var(--mono)', fontSize:10, letterSpacing:'0.22em', color:'var(--mute)'}}>
+          <div>SCULPTED MEDSPA · BRAND GUIDELINES</div>
+          <div>VOL. 01 · 2026 · EDITION 1.0</div>
+          <div>END OF DOCUMENT</div>
+        </footer>
+      </main>
+
+      <Tweaks open={editOpen} onClose={() => setEditOpen(false)} tweaks={tweaks} setTweaks={setTweaks} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
