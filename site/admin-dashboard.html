@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sculpted — Leads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --blush:#FCC2E6; --blush-soft:#FCE4F3; --rose:#E4739E; --rose-deep:#B75B7E;
+    --cream:#FBF6F1; --cream-warm:#F3ECE0; --ink:#1a1d1a; --mute:#8A857F; --rule:#E4DDD1;
+    --display:'Cormorant Garamond',serif; --text:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream-warm);color:var(--ink);font-family:var(--text);min-height:100vh}
+
+  /* Header */
+  .header{background:var(--ink);color:var(--cream);padding:20px 48px;display:flex;align-items:center;justify-content:space-between}
+  .header img{height:32px;filter:invert(1)}
+  .header-right{display:flex;align-items:center;gap:24px;font-family:var(--mono);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(251,246,241,0.6)}
+  .btn-logout{background:none;border:1px solid rgba(251,246,241,0.3);color:var(--cream);padding:8px 16px;font-family:var(--mono);font-size:10px;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;transition:border-color 180ms}
+  .btn-logout:hover{border-color:var(--blush);color:var(--blush)}
+
+  /* Stats bar */
+  .stats{background:var(--cream);border-bottom:1px solid var(--rule);padding:28px 48px;display:flex;gap:48px}
+  .stat-item{display:flex;flex-direction:column;gap:6px}
+  .stat-num{font-family:var(--display);font-size:40px;font-weight:500;line-height:1;color:var(--ink)}
+  .stat-num span{font-style:italic;color:var(--rose-deep)}
+  .stat-label{font-family:var(--mono);font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--mute)}
+
+  /* Toolbar */
+  .toolbar{padding:24px 48px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .search{flex:1;max-width:360px;padding:10px 16px;border:1px solid var(--rule);background:var(--cream);font:inherit;font-size:14px;color:var(--ink);outline:none}
+  .search:focus{border-color:var(--rose-deep)}
+  .btn-export{padding:10px 20px;background:var(--ink);color:var(--cream);font-family:var(--mono);font-size:10px;letter-spacing:0.22em;text-transform:uppercase;border:none;cursor:pointer;transition:background 180ms}
+  .btn-export:hover{background:var(--rose-deep)}
+
+  /* Table */
+  .table-wrap{padding:0 48px 48px;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;background:var(--cream);border:1px solid var(--rule)}
+  thead{background:var(--ink);color:var(--cream)}
+  th{padding:14px 20px;font-family:var(--mono);font-size:10px;letter-spacing:0.22em;text-transform:uppercase;text-align:left;font-weight:400;white-space:nowrap}
+  td{padding:16px 20px;font-size:13px;border-bottom:1px solid var(--rule);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:var(--cream-warm)}
+  .name-cell{font-weight:500}
+  .email-cell{color:var(--rose-deep);font-family:var(--mono);font-size:12px}
+  .phone-cell{font-family:var(--mono);font-size:12px;color:var(--mute)}
+  .date-cell{font-family:var(--mono);font-size:11px;color:var(--mute);white-space:nowrap}
+  .state-badge{display:inline-block;padding:3px 8px;background:var(--blush-soft);color:var(--rose-deep);font-family:var(--mono);font-size:10px;letter-spacing:0.16em;text-transform:uppercase}
+  .del-btn{background:none;border:none;cursor:pointer;color:var(--mute);font-size:16px;padding:4px;opacity:0.5;transition:opacity 180ms}
+  .del-btn:hover{opacity:1;color:var(--rose-deep)}
+
+  /* Answers expand */
+  .answers-toggle{cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:0.14em;color:var(--rose-deep);text-decoration:underline;background:none;border:none;padding:0}
+  .answers-detail{margin-top:8px;display:none;background:var(--cream-warm);padding:12px;font-size:12px;line-height:1.6}
+  .answers-detail.open{display:block}
+
+  /* Empty / loading */
+  .empty{padding:80px 48px;text-align:center;font-family:var(--display);font-size:28px;font-style:italic;color:var(--mute)}
+  .loading{padding:80px 48px;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--mute)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="/assets/sculpted-logo-white-nosub.png" alt="Sculpted"/>
+  <div class="header-right">
+    <span id="header-count">— leads</span>
+    <button class="btn-logout" id="logout-btn">Sign out</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-item">
+    <div class="stat-num" id="stat-total">—</div>
+    <div class="stat-label">Total leads</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="stat-today">—</div>
+    <div class="stat-label">Today</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="stat-week">—</div>
+    <div class="stat-label">This week</div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <input type="search" class="search" id="search" placeholder="Search by name, email, or state…"/>
+  <button class="btn-export" id="export-btn">Export CSV</button>
+</div>
+
+<div class="table-wrap">
+  <div class="loading" id="loading">Loading submissions…</div>
+  <table id="leads-table" style="display:none">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>State</th>
+        <th>Quiz answers</th>
+        <th>Submitted</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="leads-body"></tbody>
+  </table>
+  <div class="empty" id="empty" style="display:none">No leads yet.</div>
+</div>
+
+<script>
+const token = sessionStorage.getItem('sculpted-admin-token');
+if (!token) window.location.href = '/site/admin';
+
+let allSubmissions = [];
+
+const QUIZ_LABELS = ['Goal','GLP-1 history','Health flags','State','Ready'];
+
+function fmt(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    + ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function today() {
+  const d = new Date(); d.setHours(0,0,0,0); return d.getTime();
+}
+
+function renderRows(subs) {
+  const tbody = document.getElementById('leads-body');
+  const table = document.getElementById('leads-table');
+  const empty = document.getElementById('empty');
+
+  if (!subs.length) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  table.style.display = 'table';
+  empty.style.display = 'none';
+
+  tbody.innerHTML = subs.map(s => {
+    const answersHtml = Object.entries(s.answers || {}).length
+      ? Object.entries(s.answers).map(([k, v]) =>
+          `<div><strong>${QUIZ_LABELS[k] || 'Step ' + (parseInt(k)+1)}:</strong> ${v}</div>`
+        ).join('')
+      : '<em>No answers recorded</em>';
+
+    return `<tr>
+      <td class="name-cell">${esc(s.name)}</td>
+      <td class="email-cell"><a href="mailto:${esc(s.email)}" style="color:inherit">${esc(s.email)}</a></td>
+      <td class="phone-cell">${esc(s.phone || '—')}</td>
+      <td>${s.state ? `<span class="state-badge">${esc(s.state)}</span>` : '—'}</td>
+      <td>
+        <button class="answers-toggle" onclick="toggleAnswers('${s.id}')">View answers</button>
+        <div class="answers-detail" id="ans-${s.id}">${answersHtml}</div>
+      </td>
+      <td class="date-cell">${fmt(s.submittedAt)}</td>
+      <td><button class="del-btn" onclick="deleteLead('${s.id}')" title="Delete">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleAnswers(id) {
+  const el = document.getElementById('ans-' + id);
+  el.classList.toggle('open');
+}
+
+async function deleteLead(id) {
+  if (!confirm('Delete this lead?')) return;
+  const res = await fetch(`/api/submissions?id=${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: 'Bearer ' + token },
+  });
+  if (res.ok) {
+    allSubmissions = allSubmissions.filter(s => s.id !== id);
+    applyFilter();
+    updateStats();
+  }
+}
+
+function updateStats() {
+  const now = Date.now();
+  const todayStart = today();
+  const weekStart = todayStart - 6 * 86400000;
+  document.getElementById('stat-total').textContent = allSubmissions.length;
+  document.getElementById('stat-today').textContent = allSubmissions.filter(s => new Date(s.submittedAt).getTime() >= todayStart).length;
+  document.getElementById('stat-week').textContent = allSubmissions.filter(s => new Date(s.submittedAt).getTime() >= weekStart).length;
+  document.getElementById('header-count').textContent = allSubmissions.length + ' lead' + (allSubmissions.length !== 1 ? 's' : '');
+}
+
+function applyFilter() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = q
+    ? allSubmissions.filter(s => s.name.toLowerCase().includes(q) || s.email.includes(q) || (s.state || '').toLowerCase().includes(q))
+    : allSubmissions;
+  renderRows(filtered);
+}
+
+async function load() {
+  try {
+    const res = await fetch('/api/submissions', {
+      headers: { Authorization: 'Bearer ' + token },
+    });
+    if (res.status === 401) { sessionStorage.removeItem('sculpted-admin-token'); window.location.href = '/site/admin'; return; }
+    const data = await res.json();
+    allSubmissions = data.submissions || [];
+    document.getElementById('loading').style.display = 'none';
+    updateStats();
+    renderRows(allSubmissions);
+  } catch(e) {
+    document.getElementById('loading').textContent = 'Failed to load — ' + e.message;
+  }
+}
+
+document.getElementById('search').addEventListener('input', applyFilter);
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem('sculpted-admin-token');
+  window.location.href = '/site/admin';
+});
+
+document.getElementById('export-btn').addEventListener('click', () => {
+  const headers = ['Name','Email','Phone','State','Submitted'];
+  const rows = allSubmissions.map(s => [s.name, s.email, s.phone||'', s.state||'', s.submittedAt]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'sculpted-leads-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+});
+
+load();
+</script>
+</body>
+</html>

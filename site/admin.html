@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sculpted Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --blush:#FCC2E6; --blush-soft:#FCE4F3; --rose:#E4739E; --rose-deep:#B75B7E;
+    --cream:#FBF6F1; --cream-warm:#F3ECE0; --ink:#1a1d1a; --mute:#8A857F; --rule:#E4DDD1;
+    --display:'Cormorant Garamond',serif; --text:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:var(--text);min-height:100vh;display:grid;place-items:center}
+  .card{width:100%;max-width:420px;padding:56px 48px;background:var(--cream);border:1px solid var(--rule)}
+  .logo{height:40px;margin-bottom:40px}
+  .kicker{font-family:var(--mono);font-size:10px;letter-spacing:0.32em;text-transform:uppercase;color:var(--rose-deep);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+  .kicker::before{content:'';width:24px;height:1px;background:var(--rose-deep)}
+  h1{font-family:var(--display);font-weight:500;font-size:42px;line-height:1.05;margin-bottom:36px}
+  h1 em{font-style:italic;color:var(--rose-deep);font-weight:400}
+  label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+  input{width:100%;padding:14px 16px;border:1px solid var(--rule);background:var(--cream-warm);font:inherit;font-size:15px;color:var(--ink);outline:none;transition:border-color 180ms}
+  input:focus{border-color:var(--rose-deep)}
+  .btn{width:100%;margin-top:24px;padding:16px;background:var(--ink);color:var(--cream);font-family:var(--mono);font-size:12px;letter-spacing:0.22em;text-transform:uppercase;border:none;cursor:pointer;transition:background 180ms}
+  .btn:hover{background:var(--rose-deep)}
+  .error{margin-top:16px;padding:12px 16px;background:#fff0f3;border-left:2px solid var(--rose-deep);font-size:13px;color:var(--rose-deep);display:none}
+  .error.show{display:block}
+</style>
+</head>
+<body>
+<div class="card">
+  <img src="/assets/sculpted-logo-black-nosub.png" alt="Sculpted" class="logo"/>
+  <div class="kicker">Admin access</div>
+  <h1>Sign <em>in.</em></h1>
+  <form id="login-form">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required/>
+    <button type="submit" class="btn" id="submit-btn">Sign in →</button>
+    <div class="error" id="error-msg">Incorrect password. Please try again.</div>
+  </form>
+</div>
+<script>
+  // Redirect if already logged in
+  if (sessionStorage.getItem('sculpted-admin-token')) {
+    window.location.href = '/site/admin-dashboard';
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const err = document.getElementById('error-msg');
+    err.classList.remove('show');
+    btn.textContent = 'Signing in…';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: document.getElementById('password').value }),
+      });
+      const data = await res.json();
+      if (res.ok && data.token) {
+        sessionStorage.setItem('sculpted-admin-token', data.token);
+        window.location.href = '/site/admin-dashboard';
+      } else {
+        err.classList.add('show');
+        btn.textContent = 'Sign in →';
+        btn.disabled = false;
+      }
+    } catch {
+      err.textContent = 'Network error. Please try again.';
+      err.classList.add('show');
+      btn.textContent = 'Sign in →';
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

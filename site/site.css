@@ -406,6 +406,18 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .quiz-next:hover { background: var(--rose-deep); }
 .quiz-next:focus-visible { outline: 2px solid var(--rose-deep); outline-offset: 2px; }
 
+/* ---------- Contact form screen ---------- */
+.quiz-contact { display: none; flex-direction: column; min-height: 100vh; background: var(--cream); }
+.quiz-contact.active { display: flex; }
+.contact-form { display: grid; gap: 16px; max-width: 520px; }
+.contact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.contact-field { display: flex; flex-direction: column; gap: 8px; }
+.contact-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--mute); }
+.contact-input { padding: 14px 16px; border: 1px solid var(--rule); background: var(--cream-warm); font: inherit; font-size: 15px; color: var(--ink); outline: none; transition: border-color 180ms; }
+.contact-input:focus { border-color: var(--rose-deep); }
+.contact-input.error { border-color: var(--rose-deep); background: #fff0f3; }
+.contact-error { padding: 12px 16px; background: #fff0f3; border-left: 2px solid var(--rose-deep); font-size: 13px; color: var(--rose-deep); }
+
 /* ---------- Result screen ---------- */
 .quiz-result {
   min-height: 100vh;
@@ -469,6 +481,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   .step { border-right: none; border-bottom: 1px solid var(--rule); }
   .price-card { border-right: none; border-bottom: 1px solid rgba(26,29,26,0.15); }
   .quiz-main, .quiz-result { grid-template-columns: 1fr; }
+  .contact-row { grid-template-columns: 1fr; }
   .quiz-right, .result-right { min-height: 300px; }
   .quiz-left, .result-left { padding: 48px 32px; }
   .quiz-bottom { padding: 24px 32px; }
