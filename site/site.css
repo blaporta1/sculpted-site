@@ -120,8 +120,9 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
   z-index: 4;
 }
-.hero-badge .big { font-family: var(--display); font-style: italic; font-size: 24px; letter-spacing: 0; text-transform: none; color: var(--rose-deep); }
-.hero-badge .rule { width: 1px; height: 24px; background: var(--rule); }
+.hero-badge .big { font-family: var(--display); font-style: italic; font-size: 24px; letter-spacing: 0; text-transform: none; color: var(--rose-deep); line-height: 1; }
+.hero-badge > div:not(.big):not(.rule) { line-height: 1.45; }
+.hero-badge .rule { width: 1px; height: 32px; background: var(--rule); flex-shrink: 0; }
 
 /* ---------- Press strip ---------- */
 .press {
